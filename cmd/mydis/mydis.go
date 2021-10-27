@@ -3,17 +3,21 @@ package main
 import (
 	"log"
 
-	"github.com/dolfly/mydis/pkg/store"
-	"github.com/dolfly/mydis/pkg/store/mysql"
+	"github.com/dolfly/mydis/pkg/storage"
+	"github.com/dolfly/mydis/pkg/storage/db"
 	"github.com/tidwall/redcon"
 )
 
 var addr = ":6380"
 
-var s store.Store
+var s storage.Storage
 
-func init(){
-	s =  mysql.New()
+func init() {
+	var err error
+	s, err = db.New("sqlite3", "mydis.db")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
