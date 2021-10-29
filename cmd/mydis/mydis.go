@@ -14,7 +14,7 @@ var s storage.Storage
 
 func init() {
 	var err error
-	s, err = db.New("sqlite3", "mydis.db")
+	s, err = db.New("sqlite3", "mydis.db", "backup.db")
 	if err != nil {
 		panic(err)
 	}
