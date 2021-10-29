@@ -69,7 +69,7 @@ func (ms dbStorage) cmd_hget(conn redcon.Conn, args [][]byte) {
 		RKey:  string(args[1]),
 		Field: string(args[2]),
 	}
-	ok, err := ms.eg.Where("rkey = ? and field = ?", hash.RKey, hash.Field).Cols("value").Get(&hash)
+	ok, err := ms.eg.Cols("id", "rkey", "field", "value").Get(&hash)
 	if err != nil {
 		conn.WriteError(fmt.Sprintf("ERR %s", err.Error()))
 		return
@@ -124,7 +124,7 @@ func (ms dbStorage) cmd_hincrby(conn redcon.Conn, args [][]byte) {
 			conn.WriteError(fmt.Sprintf("ERR old value(%s) is not an integer or out of range", string(hash.Value)))
 			return
 		}
-		nval = valinc + value
+		nval = value + valinc
 		hash.Value = []byte(fmt.Sprintf("%d", nval))
 		_, err = ms.eg.ID(hash.Id).Update(&hash)
 	} else {
@@ -309,9 +309,39 @@ func (ms dbStorage) cmd_hset(conn redcon.Conn, args [][]byte) {
 func (ms dbStorage) cmd_hsetnx(conn redcon.Conn, args [][]byte) {
 	conn.WriteString("OK")
 }
-func (ms dbStorage) cmd_hsetlen(conn redcon.Conn, args [][]byte) {
-	conn.WriteString("OK")
+func (ms dbStorage) cmd_hstrlen(conn redcon.Conn, args [][]byte) {
+	if len(args) != 3 {
+		conn.WriteError(fmt.Sprintf("ERR wrong number of arguments for '%s' command", string(args[0])))
+		return
+	}
+	hash := storage.Hash{
+		RKey:  string(args[1]),
+		Field: string(args[2]),
+	}
+	ok, err := ms.eg.Cols("id", "rkey", "field", "value").Get(&hash)
+	if err != nil {
+		conn.WriteError(fmt.Sprintf("ERR %s", err.Error()))
+		return
+	}
+	if ok {
+		conn.WriteInt(len(hash.Value))
+	} else {
+		conn.WriteInt(0)
+	}
 }
 func (ms dbStorage) cmd_hvals(conn redcon.Conn, args [][]byte) {
-	conn.WriteString("OK")
+	if len(args) != 2 {
+		conn.WriteError(fmt.Sprintf("ERR wrong number of arguments for '%s' command", string(args[0])))
+		return
+	}
+	hashs := []storage.Hash{}
+	err := ms.eg.Where("rkey = ?", string(args[1])).Cols("id", "rkey", "field", "value").Find(&hashs)
+	if err != nil {
+		conn.WriteError(fmt.Sprintf("ERR %s", err.Error()))
+		return
+	}
+	conn.WriteArray(len(hashs))
+	for _, h := range hashs {
+		conn.WriteBulk(h.Value)
+	}
 }

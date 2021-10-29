@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  m01:
+    images
+  m02:
+    
+  s01:
+
+  s02:
+
+  mydis:
