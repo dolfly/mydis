@@ -44,12 +44,19 @@ type Hash struct {
 
 type List struct {
 	Id      int64
-	RKey    string    `json:"rkey" xorm:"varchar(255) not null 'rkey'"`
+	RKey    string    `json:"rkey" xorm:"varchar(255) not null unique(lkey) s'rkey'"`
+	NId     int64     `json:"nid" xorm:"not null unique(lkey) 'nid'"`
+	Next    *List     `json:"next" xorm:"-"`
 	Value   []byte    `json:"value" xorm:"text 'value'"`
 	Expired int64     `json:"expired" xorm:"not null 'expired'"`
 	Created time.Time `json:"created" xorm:"created"`
 	Updated time.Time `json:"updated" xorm:"updated"`
 	Deleted time.Time `json:"deleted" xorm:"deleted"`
+}
+
+func (l *List) FromDB([]byte) {
+}
+func (l *List) ToDB([]byte) {
 }
 
 type ZSet struct {

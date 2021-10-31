@@ -140,6 +140,23 @@ func (ms dbStorage) command(name string) (func(conn redcon.Conn, args [][]byte),
 		"hstrlen":      ms.cmd_hstrlen, //
 		"hvals":        ms.cmd_hvals,   //@TODO:
 		// @list
+		"blpop":      ms.cmd_blpop,      // TODO:
+		"brpop":      ms.cmd_brpop,      // TODO:
+		"brpoplpush": ms.cmd_brpoplpush, // TODO:
+		"lindex":     ms.cmd_lindex,     // TODO:
+		"linsert":    ms.cmd_linsert,    // TODO:
+		"llen":       ms.cmd_llen,       // TODO:
+		"lpop":       ms.cmd_lpop,       // TODO:
+		"lpush":      ms.cmd_lpush,      // TODO:
+		"lpushx":     ms.cmd_lpushx,     // TODO:
+		"lrange":     ms.cmd_lrange,     // TODO:
+		"lrem":       ms.cmd_lrem,       // TODO:
+		"lset":       ms.cmd_lset,       // TODO:
+		"ltrim":      ms.cmd_ltrim,      // TODO:
+		"rpop":       ms.cmd_rpop,       // TODO:
+		"rpoplpush":  ms.cmd_rpoplpush,  // TODO:
+		"rpush":      ms.cmd_rpush,      // TODO:
+		"rpushx":     ms.cmd_rpushx,     // TODO:
 	}
 	comfunc, ok := commands[name]
 	return comfunc, ok
