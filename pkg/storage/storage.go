@@ -45,7 +45,7 @@ type Hash struct {
 type List struct {
 	Id      int64
 	RKey    string    `json:"rkey" xorm:"varchar(255) not null unique(lkey) s'rkey'"`
-	NId     int64     `json:"nid" xorm:"not null unique(lkey) 'nid'"`
+	NId     int64     `json:"nid" xorm:"not null default(-1) unique(lkey) 'nid'"`
 	Next    *List     `json:"next" xorm:"-"`
 	Value   []byte    `json:"value" xorm:"text 'value'"`
 	Expired int64     `json:"expired" xorm:"not null 'expired'"`
