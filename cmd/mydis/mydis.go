@@ -1,29 +1,62 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/dolfly/mydis/pkg/storage/db"
+	"github.com/spf13/viper"
 	"github.com/tidwall/redcon"
-)
-
-var (
-	address = flag.String("address", ":6380", "set server address")
-	driver  = flag.String("driver", "sqlite3", "set db driver")
-	source  = flag.String("source", "mydis.db", "set db source")
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	flag.Parse()
-	s, err := db.New(*driver, *source)
-	if err != nil {
-		log.Fatal(err)
-		return
+	app := cli.NewApp()
+
+	app.Name = "mydis"
+	app.Usage = "my redis server"
+
+	app.Flags = []cli.Flag{
+		&cli.PathFlag{Name: "config", Aliases: []string{"c"}, Value: "conf"},
 	}
-	err = redcon.ListenAndServe(*address, s.Handler, s.Accept, s.Closed)
-	if err != nil {
-		log.Fatal(err)
+
+	app.Before = func(c *cli.Context) error {
+		conf := c.Path("config")
+		viper.SetConfigName("mydis")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(conf)
+		viper.AddConfigPath(".")
+		viper.AddConfigPath("${HOME}")
+
+		viper.SetEnvPrefix("MYDIS")
+		viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+		viper.AutomaticEnv()
+
+		viper.WatchConfig()
+		return viper.ReadInConfig()
 	}
-	log.Printf("started server at %s", *address)
+	app.Action = func(c *cli.Context) error {
+		fmt.Println(viper.AllSettings())
+		address := viper.GetString("address")
+		fmt.Println(address)
+		driver := viper.GetString("driver")
+		fmt.Println(driver)
+		sources := viper.GetStringSlice("sources")
+		fmt.Println(sources)
+		s, err := db.New(driver, sources...)
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+		err = redcon.ListenAndServe(address, s.Handler, s.Accept, s.Closed)
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+		log.Printf("started server at %s", address)
+		return nil
+	}
+	app.Run(os.Args)
 }
