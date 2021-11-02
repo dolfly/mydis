@@ -3,4 +3,3 @@ debug: true
 driver: sqlite3
 sources:
 - mydis00.db
-- mydis01.db

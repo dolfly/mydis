@@ -1,0 +1,7 @@
+.vscode
+stack
+go.sum
+README.md
+.gitignore
+.dockerignore
+Dockerfile

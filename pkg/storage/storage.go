@@ -10,6 +10,7 @@ type Storage interface {
 	Handler(conn redcon.Conn, cmd redcon.Command)
 	Accept(conn redcon.Conn) bool
 	Closed(conn redcon.Conn, err error)
+	Debug()
 }
 
 type Namespace struct {

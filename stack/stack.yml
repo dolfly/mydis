@@ -1,0 +1,68 @@
+version: '3.9'
+services:
+  nginx:
+    image: dolfly/mydis:latest
+    environment:
+      - TZ=Asia/Shanghai
+      - MYDIS_ADDRESS=:6378
+      - MYDIS_DRIVER=mysql
+      - MYDIS_DEBUG=true
+    ports:
+      - '3306:3306'
+    depends_on:
+      - master01
+      - master02
+    configs:
+      - source: mydis-config
+        target: /apps/conf/mydis.yaml
+    networks:
+      - mynet
+  master01:
+    image: mysql:5.6
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_USER: kvstore
+      MYSQL_PASSWORD: kvstore
+      MYSQL_DATABASE: kvstore
+    configs:
+      - source: my-init01
+        target: /docker-entrypoint-initdb.d/init.sql
+      - source: my-cnf-master01
+        target: /etc/mysql/conf.d/docker.cnf
+    networks:
+      - mynet
+  master02:
+    image: mysql:5.6
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_USER: kvstore
+      MYSQL_PASSWORD: kvstore
+      MYSQL_DATABASE: kvstore
+    configs:
+      - source: my-init02
+        target: /docker-entrypoint-initdb.d/init.sql
+      - source: my-cnf-master02
+        target: /etc/mysql/conf.d/docker.cnf
+    networks:
+      - mynet
+configs:
+  my-cnf-master01:
+    name: my-cnf-master01-${CONFIG_VERSION:-0}
+    file: ./conf/master01.cnf
+  my-cnf-master02:
+    name: my-cnf-master02-${CONFIG_VERSION:-0}
+    file: ./conf/master02.cnf
+  my-init01:
+    name: my-init01-${CONFIG_VERSION:-0}
+    file: ./scripts/sql/init01.sql
+  my-init02:
+    name: my-init02-${CONFIG_VERSION:-0}
+    file: ./scripts/sql/init02.sql
+  mydis-config:
+    name: my-mydis-config-${CONFIG_VERSION:-0}
+    file: ./conf/mydis.yaml
+networks:
+  mynet:
+    driver: overlay

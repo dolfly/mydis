@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -20,10 +19,12 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		&cli.PathFlag{Name: "config", Aliases: []string{"c"}, Value: "conf"},
+		&cli.BoolFlag{Name: "debug", Aliases: []string{"d"}, Value: false},
 	}
 
 	app.Before = func(c *cli.Context) error {
 		conf := c.Path("config")
+
 		viper.SetConfigName("mydis")
 		viper.SetConfigType("yaml")
 		viper.AddConfigPath(conf)
@@ -38,14 +39,17 @@ func main() {
 		return viper.ReadInConfig()
 	}
 	app.Action = func(c *cli.Context) error {
-		fmt.Println(viper.AllSettings())
+		enable := c.Bool("debug")
+		if enable {
+			viper.Debug()
+		}
 		address := viper.GetString("address")
-		fmt.Println(address)
 		driver := viper.GetString("driver")
-		fmt.Println(driver)
 		sources := viper.GetStringSlice("sources")
-		fmt.Println(sources)
 		s, err := db.New(driver, sources...)
+		if enable {
+			s.Debug()
+		}
 		if err != nil {
 			log.Fatal(err)
 			return err

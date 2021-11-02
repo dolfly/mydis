@@ -41,9 +41,6 @@ func New(driver string, sources ...string) (s storage.Storage, err error) {
 	if err != nil {
 		return
 	}
-	ms.eg.SetLogLevel(log.LOG_DEBUG)
-	ms.eg.SetLogger(log.NewSimpleLogger(os.Stdout))
-	ms.eg.Logger().ShowSQL(true)
 	ms.eg.SetDefaultCacher(caches.NewLRUCacher(caches.NewMemoryStore(), 100000000000))
 	ms.eg.TZLocation, _ = time.LoadLocation("Asia/Shanghai")
 	ms.eg.SetTableMapper(names.NewPrefixMapper(names.SameMapper{}, "t_"))
@@ -63,6 +60,12 @@ func New(driver string, sources ...string) (s storage.Storage, err error) {
 		return
 	}
 	return &ms, err
+}
+
+func (ms dbStorage) Debug() {
+	ms.eg.SetLogLevel(log.LOG_DEBUG)
+	ms.eg.SetLogger(log.NewSimpleLogger(os.Stdout))
+	ms.eg.Logger().ShowSQL(true)
 }
 
 func (ms dbStorage) Handler(conn redcon.Conn, cmd redcon.Command) {

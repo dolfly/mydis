@@ -1,2 +1,3 @@
 cmd/mydis/__debug_bin
 cmd/mydis/mydis.db
+.gitignore
