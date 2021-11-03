@@ -345,7 +345,7 @@ func (ms dbStorage) cmd_strlen(conn redcon.Conn, args [][]byte) {
 	kv := storage.Set{
 		RKey: string(args[1]),
 	}
-	has, err := ms.eg.Get(&kv)
+	has, err := ms.eg.Cols("id", "rkey", "value").Get(&kv)
 	if err != nil {
 		conn.WriteError(fmt.Sprintf("ERR %s", err.Error()))
 		return
