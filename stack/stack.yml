@@ -19,6 +19,7 @@ services:
       - mynet
   master01:
     image: mysql:5.7
+    command: [ "--ignore-db-dir=lost+found" ]
     environment:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: '123456'
@@ -30,10 +31,13 @@ services:
         target: /docker-entrypoint-initdb.d/init.sql
       - source: my_master01-conf
         target: /etc/mysql/conf.d/docker.cnf
+    volumes:
+      - my_master01-data:/var/lib/mysql
     networks:
       - mynet
   master02:
     image: mysql:5.7
+    command: [ "--ignore-db-dir=lost+found" ]
     environment:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: '123456'
@@ -45,6 +49,8 @@ services:
         target: /docker-entrypoint-initdb.d/init.sql
       - source: my_master02-conf
         target: /etc/mysql/conf.d/docker.cnf
+    volumes:
+      - my_master02-data:/var/lib/mysql
     networks:
       - mynet
 configs:
@@ -63,6 +69,9 @@ configs:
   my_mydis-conf:
     name: my_mydis-conf-${MYVER:-0}
     file: ./conf/mydis.yaml
+volumes:
+  my_master01-data:
+  my_master02-data:
 networks:
   mynet:
     driver: overlay

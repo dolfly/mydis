@@ -302,16 +302,17 @@ func (ms dbStorage) cmd_set(conn redcon.Conn, args [][]byte) {
 	kv := storage.Set{
 		RKey: string(args[1]),
 	}
-	has, err := ms.eg.Get(&kv)
+	has, err := ms.eg.Cols("id", "rkey", "value").Get(&kv)
 	if err != nil {
 		conn.WriteError(fmt.Sprintf("ERR %s", err.Error()))
 		return
 	}
 	var affected int64
 	if !has {
-		kv.Value = args[1]
+		kv.Value = args[2]
 		affected, err = ms.eg.InsertOne(kv)
 	} else {
+		kv.Value = args[2]
 		affected, err = ms.eg.ID(kv.Id).Cols("value").Update(&kv)
 	}
 	if err != nil {

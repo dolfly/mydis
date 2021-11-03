@@ -43,7 +43,7 @@ func New(driver string, sources ...string) (s storage.Storage, err error) {
 		return
 	}
 	go func() {
-		if len(ms.eg.Slaves()) > 0 {
+		if len(ms.eg.Slaves()) <= 0 {
 			return
 		}
 		lock := sync.Mutex{}
