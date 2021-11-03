@@ -7,7 +7,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/lib/pq v1.10.3
 	github.com/mattn/go-sqlite3 v1.14.9
-	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.9.0
 	github.com/tidwall/redcon v1.4.2
 	github.com/urfave/cli/v2 v2.3.0
@@ -34,6 +33,7 @@ require (
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/tidwall/btree v0.6.1 // indirect
