@@ -4,11 +4,11 @@ services:
     image: dolfly/mydis:latest
     environment:
       - TZ=Asia/Shanghai
-      - MYDIS_ADDRESS=:6378
+      - MYDIS_ADDRESS=:6380
       - MYDIS_DRIVER=mysql
       - MYDIS_DEBUG=true
     ports:
-      - '3306:3306'
+      - '6380:6380'
     depends_on:
       - master01
       - master02
