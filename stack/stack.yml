@@ -1,7 +1,7 @@
 version: '3.9'
 services:
-  nginx:
-    image: dolfly/mydis:latest
+  mydis:
+    image: dolfly/mydis
     environment:
       - TZ=Asia/Shanghai
       - MYDIS_ADDRESS=:6380
@@ -13,55 +13,55 @@ services:
       - master01
       - master02
     configs:
-      - source: mydis-config
+      - source: my_mydis-conf
         target: /apps/conf/mydis.yaml
     networks:
       - mynet
   master01:
-    image: mysql:5.6
+    image: mysql:5.7
     environment:
       TZ: Asia/Shanghai
-      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: '123456'
       MYSQL_USER: kvstore
       MYSQL_PASSWORD: kvstore
       MYSQL_DATABASE: kvstore
     configs:
-      - source: my-init01
+      - source: my_init01
         target: /docker-entrypoint-initdb.d/init.sql
-      - source: my-cnf-master01
+      - source: my_master01-conf
         target: /etc/mysql/conf.d/docker.cnf
     networks:
       - mynet
   master02:
-    image: mysql:5.6
+    image: mysql:5.7
     environment:
       TZ: Asia/Shanghai
-      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: '123456'
       MYSQL_USER: kvstore
       MYSQL_PASSWORD: kvstore
       MYSQL_DATABASE: kvstore
     configs:
-      - source: my-init02
+      - source: my_init02
         target: /docker-entrypoint-initdb.d/init.sql
-      - source: my-cnf-master02
+      - source: my_master02-conf
         target: /etc/mysql/conf.d/docker.cnf
     networks:
       - mynet
 configs:
-  my-cnf-master01:
-    name: my-cnf-master01-${CONFIG_VERSION:-0}
+  my_master01-conf:
+    name: my_master01-conf-${MYVER:-0}
     file: ./conf/master01.cnf
-  my-cnf-master02:
-    name: my-cnf-master02-${CONFIG_VERSION:-0}
+  my_master02-conf:
+    name: my_master02-conf-${MYVER:-0}
     file: ./conf/master02.cnf
-  my-init01:
-    name: my-init01-${CONFIG_VERSION:-0}
+  my_init01:
+    name: my_init01-${MYVER:-0}
     file: ./scripts/sql/init01.sql
-  my-init02:
-    name: my-init02-${CONFIG_VERSION:-0}
+  my_init02:
+    name: my_init02-${MYVER:-0}
     file: ./scripts/sql/init02.sql
-  mydis-config:
-    name: my-mydis-config-${CONFIG_VERSION:-0}
+  my_mydis-conf:
+    name: my_mydis-conf-${MYVER:-0}
     file: ./conf/mydis.yaml
 networks:
   mynet:

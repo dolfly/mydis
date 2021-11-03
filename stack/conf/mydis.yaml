@@ -2,5 +2,5 @@ address: :6380
 debug: true
 driver: mysql
 sources:
-- kvstore:kvstore@master01:3306/kvstore?charset=utf8
-- kvstore:kvstore@master02:3306/kvstore?charset=utf8
+- 'kvstore:kvstore@tcp(master01:3306)/kvstore?charset=utf8&tls=skip-verify&autocommit=true'
+- 'kvstore:kvstore@tcp(master02:3306)/kvstore?charset=utf8&tls=skip-verify&autocommit=true'

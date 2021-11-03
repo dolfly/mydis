@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
@@ -41,6 +42,28 @@ func New(driver string, sources ...string) (s storage.Storage, err error) {
 	if err != nil {
 		return
 	}
+	go func() {
+		if len(ms.eg.Slaves()) > 0 {
+			return
+		}
+		lock := sync.Mutex{}
+		master := ms.eg.Master()
+		ticker := time.NewTicker(5 * time.Second)
+		for _ = range ticker.C {
+			if err := master.Ping(); err != nil {
+				eg, _ := xorm.NewEngineGroup(ms.eg.Slave(), ms.eg.Slaves())
+				lock.Lock()
+				ms.eg = eg
+				lock.Unlock()
+			} else {
+				eg, _ := xorm.NewEngineGroup(master, ms.eg.Slaves())
+				lock.Lock()
+				ms.eg = eg
+				lock.Unlock()
+			}
+		}
+	}()
+
 	ms.eg.SetDefaultCacher(caches.NewLRUCacher(caches.NewMemoryStore(), 100000000000))
 	ms.eg.TZLocation, _ = time.LoadLocation("Asia/Shanghai")
 	ms.eg.SetTableMapper(names.NewPrefixMapper(names.SameMapper{}, "t_"))
